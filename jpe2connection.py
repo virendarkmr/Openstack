@@ -27,7 +27,7 @@ image_id = 'Centos-7.3'
 image = conn.compute.find_image(image_id)
 print (image.name)
 
-key_name = 'virenpush'
+key_name = 'testpush'
 keypair = conn.compute.find_keypair(key_name)
 print (keypair.name)
 
@@ -49,7 +49,7 @@ svolsize = 50
 sernum = 1
 
 #number of server you want to create
-sercount = 2
+sercount = 3
 
 
 ############################# volume and server creation ###################################
@@ -71,7 +71,7 @@ for i in range (sernum, sernum+sercount):
                          'delete_on_termination':False}]
 
 
- server = conn.compute.create_server(name=name, flavor_id=flavor.id, key_name=key_name, networks=[{"uuid" : network.id}], availability_zone = availability_zone, block_device_mapping=block_device_mapping )
+ server = conn.compute.create_server(name=sname, flavor_id=flavor.id, key_name=key_name, networks=[{"uuid" : network.id}], availability_zone = availability_zone, block_device_mapping=block_device_mapping )
 
  server = conn.compute.wait_for_server(server)
 
@@ -79,8 +79,7 @@ for i in range (sernum, sernum+sercount):
  security_group = 'NoRestriction'
  sg = conn.network.find_security_group(security_group)
  print (sg.name)
- vname = conn.compute.find_server(name)
- conn.compute.add_security_group_to_server(vname,sg)
+ conn.compute.add_security_group_to_server(server.id,sg)
 
  fip = conn.network.find_available_ip()
  print(fip.floating_ip_address)
