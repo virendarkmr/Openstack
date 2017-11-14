@@ -8,18 +8,18 @@ from time import sleep
 auth_args = { 'auth_url': 'https://jpe2.jiocloud.com:5000/v3',
               'user_domain_name': 'default',
               'project_domain_name':'default',
-              'project_name': 'JioPhone-PUSH-Staging',
-              'username': 'Jiophone.Pushstaging',
-              'password': '5q9DS7Cg%;a[X.>r'  }
+              'project_name': 'JioPhone-Push-Prod',
+              'username': 'JioPhone-Push-Prod',
+              'password': '9)n8Kw`a%8cA.{wJ'  }
 
 if __name__ == "__main__":
     conn = connection.Connection(verify=False,**auth_args)
 
 ############## Server Details ######################
 
-name = 'viren-test'
+name = 'prod-jmn-push-rep'
 
-flavor_id = 'm1.small'
+flavor_id = 'm1.medium'
 flavor = conn.compute.find_flavor(flavor_id)
 print ('Falvor : ' + flavor.name)
 
@@ -27,11 +27,11 @@ image_id = 'Centos-7.3'
 image = conn.compute.find_image(image_id)
 print ('image : '+ image.name)
 
-key_name = 'testpush'
+key_name = 'PushProd'
 keypair = conn.compute.find_keypair(key_name)
 print ('Keypair : '+ keypair.name)
 
-netname = 'pushdevnet'
+netname = 'PushProdFinal'
 network = conn.network.find_network(netname)
 print ('network name : ' + network.name)
 
@@ -41,7 +41,7 @@ print ('======================================')
 azone = 'JPHONE-ROW3-POD'
 
 #root volume size
-rvolsize= 20
+rvolsize= 10
 
 #sec volume size
 svolsize = 50
@@ -49,10 +49,10 @@ svolsize = 50
 ############################ iterator ####################################
 
 #name of server to start from
-sernum = 1
+sernum = 52
 
 #number of server you want to create
-sercount = 2
+sercount = 15
 
 
 ############################# volume and server creation ###################################
@@ -67,7 +67,7 @@ for i in range (sernum, sernum+sercount):
  print ('volume : ' + vol.name)
 
  for i in range(5):
-  sleep(5)
+  sleep(7)
   vol1 = conn.block_store.get_volume(vol.id)
   if vol1.status=='available': break
 
@@ -82,32 +82,32 @@ for i in range (sernum, sernum+sercount):
  server = conn.compute.wait_for_server(server)
 
 ############################### SG, FIP and vdb2 ###########################################
- security_group = 'NoRestriction'
+ security_group = 'Restricted'
  sg = conn.network.find_security_group(security_group)
- print (sg.name)
+ print ('Security Group : ' + sg.name)
  conn.compute.add_security_group_to_server(server.id,sg)
  
-# fip=conn.network.find_available_ip()
-# print(fip.floating_ip_address)
-# conn.compute.add_floating_ip_to_server(server,fip.floating_ip_address)# conn.network.update_ip(fip.floating_ip_address)
-# fip=
- 
-# net = conn.network.find_network('ext-net')
-# fip = conn.network.create_ip(floating_network_id=net.id)
-# print(fip.floating_ip_address)
-# conn.compute.add_floating_ip_to_server(server.id,fip.floating_ip_address)
-# fip=None 
+### below code will assign the existing free floating IP
+### if uncommented pleae comment create floating IP lines
+# fip=conn.network.ips(fixed_ip_address='None')
+# for ip in fip:
+#  if ip.fixed_ip_address==None:
+#   float_ip=ip.floating_ip_address 
+#   print ('floating ip : ' + float_ip)
+#   break
+# conn.compute.add_floating_ip_to_server(server.id,float_ip)
 
- fip=conn.network.ips(fixed_ip_address='None')
- for ip in fip:
-  if ip.fixed_ip_address==None:
-   float_ip=ip.floating_ip_address 
-   print ('floating ip : 'float_ip)
-   break
- conn.compute.add_floating_ip_to_server(server.id,float_ip)
+
+### below code will create new floating IP and assign it to server
+### if used please comment the above floating IP code.
+ extnet=conn.network.find_network('ext-net')
+ float_ip=conn.network.create_ip(floating_network_id=extnet.id)
+ print ('floating_ip : ' + float_ip.floating_ip_address)
+ conn.compute.add_floating_ip_to_server(server.id,float_ip.floating_ip_address)
+
  
  vol2_name = 'data' + volname
- print ('secondary vol : 'vol2_name)
+ print ('secondary vol : ' + vol2_name)
  vol2 = conn.block_store.create_volume(name=vol2_name, size=svolsize, availabilty_zone='nova')
  for i in range(5):
   sleep(5)
@@ -117,10 +117,14 @@ for i in range (sernum, sernum+sercount):
  conn.compute.create_volume_attachment(server.id,volumeId=vol2.id)
 
  print ('server ready, happy deploying!')
-
+ 
  print ('==============================================')
 
-
+ #apend the floating ip to a file for ansible use.
+ file = open("newcephost","a+") 
+ fip = float_ip.floating_ip_address
+ file.write(fip)
+ file.close()
 
 
 
