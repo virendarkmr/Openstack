@@ -66,8 +66,8 @@ for i in range (sernum, sernum+sercount):
  vol = conn.block_store.create_volume(name=volname, size=rvolsize, image_id=image.id, is_bootable='boot', availabilty_zone='nova')
  print ('volume : ' + vol.name)
 
- for i in range(5):
-  sleep(7)
+ for i in range(6):
+  sleep(6)
   vol1 = conn.block_store.get_volume(vol.id)
   if vol1.status=='available': break
 
