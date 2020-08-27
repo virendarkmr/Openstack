@@ -9,8 +9,8 @@ auth_args = { 'auth_url': 'https://jpe2.jiocloud.com:5000/v3',
               'user_domain_name': 'default',
               'project_domain_name':'default',
               'project_name': 'JIOPHONE-COMMONSERVICES',
-              'username': 'JioPhone.commonservices',
-              'password': '&h^J4Qn4y+\^?t)N'  }
+              'username': '',
+              'password': ''  }
 
 if __name__ == "__main__":
  
