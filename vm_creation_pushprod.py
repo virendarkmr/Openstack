@@ -9,8 +9,8 @@ auth_args = { 'auth_url': 'https://jpe2.jiocloud.com:5000/v3',
               'user_domain_name': 'default',
               'project_domain_name':'default',
               'project_name': 'JioPhone-Push-Prod',
-              'username': 'JioPhone-Push-Prod',
-              'password': '9)n8Kw`a%8cA.{wJ'  }
+              'username': '',
+              'password': ''  }
 
 if __name__ == "__main__":
     conn = connection.Connection(verify=False,**auth_args)
